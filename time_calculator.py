@@ -9,9 +9,5 @@ def add_time(start, duration):
 
     time_separtor.set_next(time_calcutor)
 
-    result = time_separtor.handle(start=start, duration=duration)
-
-    # return new_time
-
-
-add_time("11:06 PM", "2:02")
+    new_time = time_separtor.handle(start=start, duration=duration)
+    return new_time
