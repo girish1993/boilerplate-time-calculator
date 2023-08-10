@@ -1,4 +1,5 @@
 from handlers.handler import TimeHandler
+import math
 
 
 class TimeCalculator(TimeHandler):
@@ -41,9 +42,9 @@ class TimeCalculator(TimeHandler):
         return self.formulate_result()
 
     def formulate_result(self):
-        if self.new_number_days < 1:
-            return f"{self.new_hour}:{self.new_mins:02d} {self.time_format}"
-        return f"{self.new_hour}:{self.new_mins:02d} {self.time_format} {self.day_diff_str}"
+        if self.day_diff_str:
+            return f"{self.new_hour}:{self.new_mins:02d} {self.time_format} {self.day_diff_str}"
+        return f"{self.new_hour}:{self.new_mins:02d} {self.time_format}"
 
     def calculate_new_time(self):
         self.new_hour = self.hour + self.hour_diff
@@ -52,16 +53,22 @@ class TimeCalculator(TimeHandler):
     def update_new_time(self):
         print("in update new time method")
 
-        self.new_number_days = round(self.new_hour / 24)
+        self.new_number_days = math.ceil(self.new_hour / 24) if self.new_hour > 24 else 0
+        number_of_changes = math.ceil(self.new_hour / 12)
 
         if self.new_mins > 60:
             self.new_mins %= 60
             self.new_hour += 1
 
-        if self.new_hour > 12:
-            self.new_hour %= 12
+        if self.new_hour == 12:
             self.time_format = self.possible_time_formats[self.time_format]
+            self.day_diff_str = "(next day)" if self.time_format == "AM" else None
+        if self.new_hour > 12:
+            changed_time = self.new_hour % 12
+            self.new_hour = 12 if changed_time == 0 else changed_time
+            self.time_format = self.possible_time_formats[
+                    self.time_format] if number_of_changes % 2 != 0 else self.time_format
             if self.time_format == "AM" and self.new_number_days == 1:
                 self.day_diff_str = "(next day)"
             if (self.day_diff_str is None) and (self.new_number_days > 1):
-                self.day_diff_str = f"{self.new_number_days} days later"
+                self.day_diff_str = f"({self.new_number_days} days later)"
