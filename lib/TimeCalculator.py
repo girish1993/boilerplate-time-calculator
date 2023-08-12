@@ -71,7 +71,7 @@ class TimeCalculator(TimeHandler):
 
         if self.out_hour >= 12:
             self.number_of_clock_format_changes = self.conditional_round(self.out_hour, 12)
-            self.out_hour = self.out_hour % 12 if self.out_hour != 12 else 12
+            self.out_hour = 12 if self.out_hour == 12 or self.out_hour % 12 == 0 else self.out_hour % 12
 
     def set_date_diff_component(self):
         if self.number_of_clock_format_changes:
@@ -80,7 +80,7 @@ class TimeCalculator(TimeHandler):
             elif self.inp_clock_format == "AM" and self.number_of_clock_format_changes % 2 != 0:
                 self.out_number_diff_of_days = math.floor(self.number_of_clock_format_changes / 2)
             else:
-                self.out_number_diff_of_days = self.out_number_diff_of_days / 2
+                self.out_number_diff_of_days = int(self.number_of_clock_format_changes / 2)
 
     def set_clock_format_component(self):
         self.out_clock_format = self.possible_time_formats[
