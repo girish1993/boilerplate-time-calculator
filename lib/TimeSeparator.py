@@ -27,6 +27,7 @@ class TimeSeparator(TimeHandler):
         self.set_components(key="minutes", value=int(split_hour_min[1]))
         self.set_components(key="diff_duration_hour", value=int(split_diff[0]))
         self.set_components(key="diff_duration_mins", value=int(split_diff[1]))
+        self.set_components(key="day", value=request["day"])
         if self.next_handler:
             return self.next_handler.handle(**self.get_components())
         return self.get_components()

@@ -4,13 +4,13 @@ import math
 
 class TimeCalculator(TimeHandler):
     days = [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday",
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday",
     ]
     possible_time_formats = {"AM": "PM", "PM": "AM"}
 
@@ -24,9 +24,11 @@ class TimeCalculator(TimeHandler):
         self.out_hour = None
         self.out_min = None
         self.out_clock_format = None
-        self.out_number_diff_of_days = None
+        self.out_number_diff_of_days = 0
         self.number_of_clock_format_changes = 0
         self.out_diff_day_str = None
+        self.in_day_of_week = None
+        self.out_day_of_week = None
 
     def set_next(self, handler):
         self.next_handler = handler
@@ -47,12 +49,15 @@ class TimeCalculator(TimeHandler):
         self.inp_add_hour = request["diff_duration_hour"]
         self.inp_add_min = request["diff_duration_mins"]
         self.inp_clock_format = request["time_format"]
+        self.in_day_of_week = request["day"]
+
         self.set_hour_component()
         self.set_minute_component()
         self.update_hour_and_minute_components()
         self.set_date_diff_component()
         self.set_clock_format_component()
         self.set_day_diff_str()
+        self.set_day_of_week()
 
         if self.next_handler:
             return self.next_handler.handle()
@@ -92,6 +97,17 @@ class TimeCalculator(TimeHandler):
                 self.out_diff_day_str = " (next day)"
             else:
                 self.out_diff_day_str = f" ({self.out_number_diff_of_days} days later)"
+
+    def set_day_of_week(self):
+        if self.in_day_of_week:
+            self.in_day_of_week = self.in_day_of_week.lower()
+            curr_pos = self.days.index(self.in_day_of_week)
+            new_pos = curr_pos + self.out_number_diff_of_days
+            self.out_day_of_week = self.days[new_pos % 7]
+            if self.out_diff_day_str:
+                self.out_diff_day_str = f", {self.out_day_of_week.capitalize()}{self.out_diff_day_str}"
+            else:
+                self.out_diff_day_str = f", {self.out_day_of_week.capitalize()}"
 
     def formulate_result(self):
         if self.out_diff_day_str:
